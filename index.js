@@ -1,42 +1,41 @@
 const { Client, LocalAuth } = require('whatsapp-web.js');
-const qrcode = require('qrcode-terminal');
 
-// Usanidi wa Puppeteer kwa ajili ya Render (Docker)
+// Usanidi wa Puppeteer uliorekebishwa kwa ajili ya Render
 const client = new Client({
     authStrategy: new LocalAuth(),
     puppeteer: {
-        // Hii ndio njia ya Chrome ndani ya Docker image tuliyoweka
         executablePath: '/usr/bin/google-chrome-stable',
         headless: true,
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
             '--disable-dev-shm-usage',
-            '--disable-accelerated-2d-canvas',
-            '--no-first-run',
             '--no-zygote',
-            '--single-process', // Hii inasaidia kupunguza RAM
+            '--single-process', // Inasaidia sana seva zenye RAM ndogo
             '--disable-gpu'
         ],
     }
 });
 
-// Kutengeneza QR Code kwenye Logs
+// QR Code itatokea hapa kwenye Logs
 client.on('qr', (qr) => {
-    console.log('--- SCAN QR CODE HAPA CHINI ---');
-    qrcode.generate(qr, { small: true });
+    console.log('SCAN QR HAPA:', qr);
 });
 
-// Bot ikishafanikiwa kuunganishwa
+// Bot ikishakubali
 client.on('ready', () => {
-    console.log('Bot ipo tayari! Nilkanifx-Bot is Live!');
+    console.log('Nilkanifx-Bot ipo LIVE sasa hivi!');
 });
 
-// Mfano wa jibu la bot (Unaweza kuongeza kodi zako hapa chini)
+// Mfano wa jibu (Reply)
 client.on('message', message => {
-    if (message.body.toLowerCase() === 'habari') {
-        message.reply('Habari! Karibu Nilkanifx. Nitakusaidia vipi leo?');
+    if (message.body.toLowerCase() === 'mambo') {
+        message.reply('Safi! Karibu Nilkanifx Trading Bot.');
     }
 });
 
-client.initialize();
+// HAPA NDIO DAWA: Tunaipa bot sekunde 30 ijiandae kabla ya kuwaka
+console.log('Bot inajipanga... Tafadhali subiri sekunde 30...');
+setTimeout(() => {
+    client.initialize().catch(err => console.error('Kuna shida kuanzisha bot:', err));
+}, 30000);
