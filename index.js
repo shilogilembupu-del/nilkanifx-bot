@@ -1,6 +1,17 @@
 const { Client, LocalAuth } = require('whatsapp-web.js');
+const express = require('express');
+const app = express();
+const port = process.env.PORT || 3000;
 
-// Usanidi wa Puppeteer uliorekebishwa kwa ajili ya Render
+// HII NI DAWA YA RENDER: Seva ya uongo ili wasizime bot
+app.get('/', (req, res) => {
+    res.send('Nilkanifx Bot ipo hai!');
+});
+
+app.listen(port, () => {
+    console.log(`Seva inasikiliza kwenye port ${port}`);
+});
+
 const client = new Client({
     authStrategy: new LocalAuth(),
     puppeteer: {
@@ -11,30 +22,22 @@ const client = new Client({
             '--disable-setuid-sandbox',
             '--disable-dev-shm-usage',
             '--no-zygote',
-            '--single-process', // Inasaidia sana seva zenye RAM ndogo
+            '--single-process',
             '--disable-gpu'
         ],
     }
 });
 
-// QR Code itatokea hapa kwenye Logs
 client.on('qr', (qr) => {
+    // Hii itachapa QR code kama text ndefu kwenye logs
     console.log('SCAN QR HAPA:', qr);
 });
 
-// Bot ikishakubali
 client.on('ready', () => {
-    console.log('Nilkanifx-Bot ipo LIVE sasa hivi!');
+    console.log('Bot ipo tayari kabisa!');
 });
 
-// Mfano wa jibu (Reply)
-client.on('message', message => {
-    if (message.body.toLowerCase() === 'mambo') {
-        message.reply('Safi! Karibu Nilkanifx Trading Bot.');
-    }
-});
-
-// HAPA NDIO DAWA: Tunaipa bot sekunde 30 ijiandae kabla ya kuwaka
+// Tunaipa bot muda kidogo ijiandae
 console.log('Bot inajipanga... Tafadhali subiri sekunde 30...');
 setTimeout(() => {
     client.initialize().catch(err => console.error('Kuna shida kuanzisha bot:', err));
