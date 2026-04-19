@@ -1,11 +1,13 @@
 const { Client, LocalAuth } = require('whatsapp-web.js');
+const qrcode = require('qrcode-terminal');
 const express = require('express');
+
 const app = express();
 const port = process.env.PORT || 3000;
 
-// HII NI DAWA YA RENDER: Seva ya uongo ili wasizime bot
+// Seva ya uongo ili kuzuia Render isizime bot (Fix kwa "No open ports detected")
 app.get('/', (req, res) => {
-    res.send('Nilkanifx Bot ipo hai!');
+    res.send('Nilkanifx Bot is running!');
 });
 
 app.listen(port, () => {
@@ -15,7 +17,7 @@ app.listen(port, () => {
 const client = new Client({
     authStrategy: new LocalAuth(),
     puppeteer: {
-        executablePath: '/usr/bin/google-chrome-stable',
+        executablePath: '/usr/bin/google-chrome-stable', // Njia sahihi ya Docker
         headless: true,
         args: [
             '--no-sandbox',
@@ -28,16 +30,17 @@ const client = new Client({
     }
 });
 
+// QR Code itatokea hapa kwenye Logs
 client.on('qr', (qr) => {
-    // Hii itachapa QR code kama text ndefu kwenye logs
-    console.log('SCAN QR HAPA:', qr);
+    console.log('--- SCAN QR CODE HAPA CHINI ---');
+    qrcode.generate(qr, { small: true });
 });
 
 client.on('ready', () => {
-    console.log('Bot ipo tayari kabisa!');
+    console.log('Bot ipo tayari! Nilkanifx-Bot is Live!');
 });
 
-// Tunaipa bot muda kidogo ijiandae
+// Tunaipa bot sekunde 30 kujiandaa ili kuzuia kosa la "Too early"
 console.log('Bot inajipanga... Tafadhali subiri sekunde 30...');
 setTimeout(() => {
     client.initialize().catch(err => console.error('Kuna shida kuanzisha bot:', err));
